@@ -131,8 +131,8 @@
         function getApiUrl() {
             const saved = localStorage.getItem('pushups_api_url');
             if (saved) return saved;
-            // Default to the current public tunnel address
-            return 'https://deep-rings-own.loca.lt/api/counts';
+            // Default to the stable public tunnel address
+            return 'https://brodie-ned-pushups.loca.lt/api/counts';
         }
         let API_URL = getApiUrl();
 
