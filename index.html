@@ -251,6 +251,7 @@
                 updateUI();
             } catch (err) {
                 console.error("Failed to save data:", err);
+                alert("Failed to save data. Please check if your server is running and the tunnel URL is correct!");
             } finally {
                 isUpdating = false;
             }
