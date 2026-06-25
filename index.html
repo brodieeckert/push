@@ -131,9 +131,8 @@
         function getApiUrl() {
             const saved = localStorage.getItem('pushups_api_url');
             if (saved) return saved;
-            return window.location.protocol.startsWith('http') 
-                ? '/api/counts' 
-                : 'http://localhost:3000/api/counts';
+            // Default to the current public tunnel address
+            return 'https://deep-rings-own.loca.lt/api/counts';
         }
         let API_URL = getApiUrl();
 
