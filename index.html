@@ -1,59 +1,10 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pushup Tracker</title>
-    <!-- Tailwind CSS for sleek UI -->
-    <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col items-center justify-center p-4">
-
-    <div class="w-full max-w-md bg-slate-800 rounded-2xl shadow-xl p-6 border border-slate-700">
-        <header class="text-center mb-8">
-            <h1 class="text-3xl font-extrabold tracking-tight bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">
-                Daily Pushup Challenge
-            </h1>
-            <p class="text-slate-400 text-sm mt-2">Target: 100 pushups each day</p>
-            <p class="text-xs text-amber-400 mt-1">Resets daily at 12:00 PM Adelaide Time</p>
-        </header>
-
-        <!-- Users Grid -->
-        <div class="grid grid-cols-2 gap-4 mb-6">
-            <!-- Brodie's Card -->
-            <div class="bg-slate-750 p-4 rounded-xl border border-slate-700 flex flex-col items-center justify-between text-center">
-                <span class="font-bold text-lg text-slate-300">Brodie</span>
-                <div class="my-6">
-                    <span id="brodie-count" class="text-5xl font-black text-emerald-400">0</span>
-                    <span class="text-slate-500 text-sm block mt-1">/ 100</span>
-                </div>
-                <button id="brodie-btn" onclick="increment('brodie')" class="w-full bg-emerald-500 hover:bg-emerald-600 active:scale-95 transition-all text-slate-900 font-bold py-4 rounded-lg text-2xl shadow-lg shadow-emerald-500/20 disabled:opacity-50">
-                    +1
-                </button>
-            </div>
-
-            <!-- Ned's Card -->
-            <div class="bg-slate-750 p-4 rounded-xl border border-slate-700 flex flex-col items-center justify-between text-center">
-                <span class="font-bold text-lg text-slate-300">Ned</span>
-                <div class="my-6">
-                    <span id="ned-count" class="text-5xl font-black text-cyan-400">0</span>
-                    <span class="text-slate-500 text-sm block mt-1">/ 100</span>
-                </div>
-                <button id="ned-btn" onclick="increment('ned')" class="w-full bg-cyan-500 hover:bg-cyan-600 active:scale-95 transition-all text-slate-900 font-bold py-4 rounded-lg text-2xl shadow-lg shadow-cyan-500/20 disabled:opacity-50">
-                    +1
-                </button>
-            </div>
-        </div>
-
-        <!-- Connection Status -->
-        <div id="status" class="text-center text-xs text-slate-500 border-t border-slate-700 pt-4">
-            Connecting to sync network...
-        </div>
-    </div>
-
-    <script>
-        // Generated a completely unique public bucket endpoint for Brodie and Ned
-        const API_URL = 'https://kvdb.io/6a3d9cb9f5f4af5e29313214/pushups_v2';
+<script>
+        // Your custom JSONBin configuration
+        const BIN_ID = '6a3d9cb9f5f4af5e29313214';
+        const API_URL = `https://api.jsonbin.io/v3/b/${BIN_ID}`;
+        
+        // ⚠️ PASTE YOUR JSONBIN MASTER API KEY HERE BETWEEN THE QUOTES:
+        const MASTER_KEY = 'YOUR_MASTER_KEY_HERE'; 
 
         let currentData = { brodie: 0, ned: 0 };
         let isUpdating = false;
@@ -74,38 +25,42 @@
             let day = parseInt(map.day, 10);
             const hour = parseInt(map.hour, 10);
 
-            // Resets exactly at 12:00 PM (noon). Hours 0-11 belong to the previous day's challenge cycle
+            // Resets exactly at 12:00 PM (noon). Hours 0-11 belong to yesterday's cycle
             if (hour < 12) {
                 day -= 1; 
             }
             return `${year}-${month}-${day}`;
         }
 
-        // Fetch live counts from the cloud
+        // Fetch live counts from JSONBin
         async function fetchCounts() {
             if (isUpdating) return; 
             try {
-                const response = await fetch(API_URL);
+                const response = await fetch(API_URL, {
+                    method: 'GET',
+                    headers: {
+                        'X-Master-Key': MASTER_KEY,
+                        'X-Bin-Meta': 'false' // Tells JSONBin to return just our data, no extra metadata
+                    }
+                });
+                
                 if (response.ok) {
                     const data = await response.json();
-                    
-                    // Verify if the cloud data matches our current Adelaide date cycle
                     const currentCycle = getAdelaideDateKey();
+                    
                     if (data.cycleKey === currentCycle) {
                         currentData.brodie = data.brodie || 0;
                         currentData.ned = data.ned || 0;
                     } else {
-                        // Cloud has old data, trigger a fresh reset cycle locally
+                        // Time has crossed 12pm Adelaide time since last update. Reset!
                         currentData.brodie = 0;
                         currentData.ned = 0;
+                        await saveCounts(0, 0); 
                     }
                     
                     updateUI();
-                    statusEl.innerText = "Live Synced via Cloud Storage";
-                    statusEl.className = "text-center text-xs text-emerald-500 border-t border-slate-700 pt-4";
-                } else if (response.status === 404) {
-                    // First time initialization
-                    await saveCounts(0, 0);
+                    statusEl.innerText = "Live Synced via Private Cloud";
+                    statusEl.className = "text-center text-xs text-emerald-400 border-t border-slate-700 pt-4";
                 }
             } catch (err) {
                 statusEl.innerText = "Syncing paused (checking connection...)";
@@ -113,7 +68,7 @@
             }
         }
 
-        // Save counts to the cloud
+        // Save counts to JSONBin using PUT (replaces the whole file)
         async function saveCounts(brodieVal, nedVal) {
             isUpdating = true;
             const payload = {
@@ -124,8 +79,11 @@
 
             try {
                 await fetch(API_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Master-Key': MASTER_KEY
+                    },
                     body: JSON.stringify(payload)
                 });
                 currentData.brodie = brodieVal;
@@ -145,23 +103,19 @@
 
         // Handle button clicks
         async function increment(user) {
-            // Optimistic UI update so it feels instant when clicking
             if (user === 'brodie') {
                 currentData.brodie += 1;
             } else {
                 currentData.ned += 1;
             }
-            updateUI();
+            updateUI(); // Optimistic update on screen instantly
 
-            // Push to cloud instantly
             await saveCounts(currentData.brodie, currentData.ned);
         }
 
-        // Auto-refresh data from cloud every 3 seconds to capture changes from the other device
+        // Auto-refresh data from cloud every 3 seconds
         setInterval(fetchCounts, 3000);
         
         // Initial load
         fetchCounts();
     </script>
-</body>
-</html>
