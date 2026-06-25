@@ -54,7 +54,7 @@
             </div>
 
             <!-- Right Column: Sidebar / Leaderboard (1/3 width on desktop) -->
-            <div class="bg-slate-800 rounded-2xl shadow-xl p-6 border border-slate-700 flex flex-col justify-between min-h-[350px]">
+            <div class="bg-slate-800 rounded-2xl shadow-xl p-6 border border-slate-700 flex flex-col justify-between min-h-[420px]">
                 <div>
                     <h2 class="text-lg font-bold text-slate-200 mb-4 flex items-center justify-between border-b border-slate-700 pb-2">
                         <span>Leaderboard</span>
@@ -62,8 +62,19 @@
                     </h2>
                     
                     <!-- Dynamic Leaderboard list -->
-                    <div id="leaderboard-list" class="space-y-3.5 max-h-[220px] overflow-y-auto pr-1">
+                    <div id="leaderboard-list" class="space-y-3.5 max-h-[160px] overflow-y-auto pr-1">
                         <!-- Dynamically populated items -->
+                    </div>
+                </div>
+
+                <!-- Yesterday's Results -->
+                <div class="border-t border-slate-700/60 pt-3 mt-3">
+                    <div class="flex items-center justify-between mb-2">
+                        <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Yesterday's Results</h3>
+                        <span id="yesterday-date" class="text-[10px] font-medium text-slate-500"></span>
+                    </div>
+                    <div id="yesterday-list" class="space-y-2 max-h-[120px] overflow-y-auto pr-1 text-slate-300">
+                        <!-- Dynamically populated -->
                     </div>
                 </div>
 
@@ -171,13 +182,21 @@
                     
                     if (data.cycleKey === currentCycle) {
                         currentData.users = data.users || {};
+                        currentData.yesterday = data.yesterday || {};
+                        currentData.yesterdayCycleKey = data.yesterdayCycleKey || "";
                     } else {
-                        // Resets all counts at 12pm Adelaide Time
-                        currentData.users = data.users || {};
-                        for (const u in currentData.users) {
-                            currentData.users[u] = 0;
+                        // Resets all counts at 12pm Adelaide Time (Noon)
+                        const previousUsers = data.users || {};
+                        const resetUsers = {};
+                        for (const u in previousUsers) {
+                            resetUsers[u] = 0;
                         }
-                        await saveCounts(currentData.users); 
+                        
+                        currentData.yesterday = previousUsers;
+                        currentData.yesterdayCycleKey = data.cycleKey || "";
+                        currentData.users = resetUsers;
+                        
+                        await saveCounts(resetUsers, previousUsers, data.cycleKey || ""); 
                     }
                     
                     updateUI();
@@ -191,11 +210,13 @@
         }
 
         // Save counts to backend
-        async function saveCounts(usersObj) {
+        async function saveCounts(usersObj, yesterdayObj = currentData.yesterday, yesterdayCycleKey = currentData.yesterdayCycleKey) {
             isUpdating = true;
             const payload = {
                 cycleKey: getAdelaideDateKey(),
-                users: usersObj
+                users: usersObj,
+                yesterday: yesterdayObj,
+                yesterdayCycleKey: yesterdayCycleKey
             };
 
             try {
@@ -208,6 +229,8 @@
                     body: JSON.stringify(payload)
                 });
                 currentData.users = usersObj;
+                currentData.yesterday = yesterdayObj;
+                currentData.yesterdayCycleKey = yesterdayCycleKey;
                 updateUI();
             } catch (err) {
                 console.error("Failed to save data:", err);
@@ -289,7 +312,14 @@
                     item.innerHTML = `
                         <div class="flex justify-between items-center text-sm font-semibold">
                             <span class="${selectedUser === name ? 'text-cyan-400 font-bold' : 'text-slate-300'}">${name}</span>
-                            <span class="text-slate-400">${count} <span class="text-xs text-slate-500">/ 100</span></span>
+                            <div class="flex items-center gap-2">
+                                <span class="text-slate-400">${count} <span class="text-xs text-slate-500">/ 100</span></span>
+                                <button onclick="handleRemoveFriend(event, '${name}')" class="text-slate-500 hover:text-rose-400 active:scale-95 transition-all px-1" title="Remove Friend">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
+                                    </svg>
+                                </button>
+                            </div>
                         </div>
                         <div class="w-full bg-slate-900 h-2 rounded-full overflow-hidden">
                             <div class="h-full bg-gradient-to-r ${progressColor} transition-all duration-500" style="width: ${percentage}%"></div>
@@ -298,6 +328,53 @@
                     leaderboardList.appendChild(item);
                 });
             }
+
+            // Render Yesterday's Results
+            const yesterdayDateEl = document.getElementById('yesterday-date');
+            const yesterdayList = document.getElementById('yesterday-list');
+            
+            if (currentData.yesterdayCycleKey) {
+                yesterdayDateEl.innerText = `(${currentData.yesterdayCycleKey})`;
+            } else {
+                yesterdayDateEl.innerText = '';
+            }
+            
+            yesterdayList.innerHTML = '';
+            const yesterdayUsers = currentData.yesterday || {};
+            const sortedYesterday = Object.entries(yesterdayUsers).sort((a, b) => b[1] - a[1]);
+
+            if (sortedYesterday.length === 0) {
+                yesterdayList.innerHTML = `<div class="text-[11px] text-slate-500 italic py-2 text-center">No history available yet.</div>`;
+            } else {
+                sortedYesterday.forEach(([name, count]) => {
+                    const row = document.createElement('div');
+                    row.className = "flex justify-between items-center text-xs py-1 border-b border-slate-700/30";
+                    row.innerHTML = `
+                        <span class="text-slate-400">${name}</span>
+                        <span class="font-bold text-slate-300">${count}</span>
+                    `;
+                    yesterdayList.appendChild(row);
+                });
+            }
+        }
+
+        async function handleRemoveFriend(event, name) {
+            event.stopPropagation();
+            if (!confirm(`Are you sure you want to permanently remove "${name}"?`)) return;
+
+            if (currentData.users[name] !== undefined) {
+                delete currentData.users[name];
+            }
+            if (currentData.yesterday && currentData.yesterday[name] !== undefined) {
+                delete currentData.yesterday[name];
+            }
+
+            if (selectedUser === name) {
+                selectedUser = null;
+            }
+
+            updateUI();
+            await saveCounts(currentData.users);
         }
 
         function selectUser(name) {
