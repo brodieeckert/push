@@ -1,4 +1,57 @@
-<script>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pushup Tracker</title>
+    <!-- Tailwind CSS for sleek UI -->
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col items-center justify-center p-4">
+
+    <div class="w-full max-w-md bg-slate-800 rounded-2xl shadow-xl p-6 border border-slate-700">
+        <header class="text-center mb-8">
+            <h1 class="text-3xl font-extrabold tracking-tight bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">
+                Daily Pushup Challenge
+            </h1>
+            <p class="text-slate-400 text-sm mt-2">Target: 100 pushups each day</p>
+            <p class="text-xs text-amber-400 mt-1">Resets daily at 12:00 PM Adelaide Time</p>
+        </header>
+
+        <!-- Users Grid -->
+        <div class="grid grid-cols-2 gap-4 mb-6">
+            <!-- Brodie's Card -->
+            <div class="bg-slate-750 p-4 rounded-xl border border-slate-700 flex flex-col items-center justify-between text-center">
+                <span class="font-bold text-lg text-slate-300">Brodie</span>
+                <div class="my-6">
+                    <span id="brodie-count" class="text-5xl font-black text-emerald-400">0</span>
+                    <span class="text-slate-500 text-sm block mt-1">/ 100</span>
+                </div>
+                <button id="brodie-btn" onclick="increment('brodie')" class="w-full bg-emerald-500 hover:bg-emerald-600 active:scale-95 transition-all text-slate-900 font-bold py-4 rounded-lg text-2xl shadow-lg">
+                    +1
+                </button>
+            </div>
+
+            <!-- Ned's Card -->
+            <div class="bg-slate-750 p-4 rounded-xl border border-slate-700 flex flex-col items-center justify-between text-center">
+                <span class="font-bold text-lg text-slate-300">Ned</span>
+                <div class="my-6">
+                    <span id="ned-count" class="text-5xl font-black text-cyan-400">0</span>
+                    <span class="text-slate-500 text-sm block mt-1">/ 100</span>
+                </div>
+                <button id="ned-btn" onclick="increment('ned')" class="w-full bg-cyan-500 hover:bg-cyan-600 active:scale-95 transition-all text-slate-900 font-bold py-4 rounded-lg text-2xl shadow-lg">
+                    +1
+                </button>
+            </div>
+        </div>
+
+        <!-- Connection Status -->
+        <div id="status" class="text-center text-xs text-slate-500 border-t border-slate-700 pt-4">
+            Connecting to sync network...
+        </div>
+    </div>
+
+    <script>
         // Your custom JSONBin configuration
         const BIN_ID = '6a3d9cb9f5f4af5e29313214';
         const API_URL = `https://api.jsonbin.io/v3/b/${BIN_ID}`;
@@ -119,3 +172,5 @@
         // Initial load
         fetchCounts();
     </script>
+</body>
+</html>
