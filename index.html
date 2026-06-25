@@ -4,28 +4,43 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pushup Tracker</title>
-    <!-- Tailwind CSS for sleek UI -->
+    <!-- Tailwind CSS for sleek layout -->
     <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts for raw athletic typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0c0c0e;
+        }
+        .font-display {
+            font-family: 'Bebas Neue', sans-serif;
+            letter-spacing: 0.04em;
+        }
+    </style>
 </head>
-<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col items-center justify-center p-4 md:p-8">
+<body class="text-zinc-100 min-h-screen flex flex-col items-center justify-center p-4 md:p-8">
 
     <div class="w-full max-w-4xl flex flex-col gap-6">
-        <header class="text-center">
-            <h1 class="text-4xl font-extrabold tracking-tight bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">
+        <header class="text-center select-none cursor-pointer" id="app-header" title="Double click to open developer settings">
+            <h1 class="text-5xl md:text-6xl font-display font-bold tracking-wider text-white hover:text-[#ccff00] transition-colors duration-200">
                 Daily Pushup Challenge
             </h1>
-            <p class="text-slate-400 text-sm mt-2 font-medium">Target: 100 pushups each day</p>
-            <p class="text-xs text-amber-400 mt-1">Resets daily at 12:00 PM Adelaide Time</p>
+            <p class="text-zinc-400 text-xs font-bold uppercase tracking-widest mt-2">Target: 100 pushups each day</p>
         </header>
 
-        <!-- Main Workspace Grid Layout -->
+        <!-- Main Grid Layout -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
             
             <!-- Left Column: Selection and Actions (2/3 width on desktop) -->
-            <div class="md:col-span-2 bg-slate-800 rounded-2xl shadow-xl p-6 border border-slate-700 flex flex-col justify-between min-h-[350px]">
+            <div class="md:col-span-2 bg-[#141416] rounded-2xl shadow-xl p-6 border border-zinc-800/80 flex flex-col justify-between min-h-[350px]">
                 <div>
-                    <h2 class="text-lg font-bold text-slate-200 mb-4 flex items-center gap-2">
-                        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                    <h2 class="text-xs font-bold text-zinc-400 uppercase tracking-widest mb-4 flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-[#ccff00] animate-pulse"></span>
                         Select Who You Are:
                     </h2>
                     
@@ -35,18 +50,18 @@
                     </div>
                 </div>
 
-                <div class="border-t border-slate-700/60 pt-6">
+                <div class="border-t border-zinc-800/60 pt-6">
                     <div class="text-center mb-6">
-                        <span class="text-slate-400 text-xs block uppercase tracking-wider font-semibold mb-1">Selected Active Profile</span>
-                        <span id="active-user-display" class="text-2xl font-black text-slate-500">No profile selected</span>
+                        <span class="text-zinc-400 text-xs block uppercase tracking-wider font-semibold mb-1">Selected Active Profile</span>
+                        <span id="active-user-display" class="text-3xl font-display font-bold text-zinc-500">No profile selected</span>
                     </div>
 
                     <!-- Large Action Buttons -->
                     <div class="grid grid-cols-2 gap-4">
-                        <button id="btn-plus-1" onclick="incrementActive(1)" disabled class="w-full bg-emerald-500 hover:bg-emerald-600 active:scale-95 disabled:hover:bg-slate-700 disabled:bg-slate-700 disabled:opacity-30 disabled:scale-100 transition-all text-slate-900 disabled:text-slate-500 font-black py-5 rounded-xl text-3xl shadow-lg shadow-emerald-500/10">
+                        <button id="btn-plus-1" onclick="incrementActive(1)" disabled class="w-full bg-[#ccff00] hover:bg-[#b8e600] active:scale-95 disabled:hover:bg-zinc-800 disabled:bg-zinc-800 disabled:opacity-20 disabled:scale-100 transition-all text-black disabled:text-zinc-500 font-display font-bold py-5 rounded-xl text-4xl shadow-lg shadow-[#ccff00]/10">
                             +1
                         </button>
-                        <button id="btn-plus-10" onclick="incrementActive(10)" disabled class="w-full bg-cyan-500 hover:bg-cyan-600 active:scale-95 disabled:hover:bg-slate-700 disabled:bg-slate-700 disabled:opacity-30 disabled:scale-100 transition-all text-slate-900 disabled:text-slate-500 font-black py-5 rounded-xl text-3xl shadow-lg shadow-cyan-500/10">
+                        <button id="btn-plus-10" onclick="incrementActive(10)" disabled class="w-full bg-[#ccff00] hover:bg-[#b8e600] active:scale-95 disabled:hover:bg-zinc-800 disabled:bg-zinc-800 disabled:opacity-20 disabled:scale-100 transition-all text-black disabled:text-zinc-500 font-display font-bold py-5 rounded-xl text-4xl shadow-lg shadow-[#ccff00]/10">
                             +10
                         </button>
                     </div>
@@ -54,11 +69,11 @@
             </div>
 
             <!-- Right Column: Sidebar / Leaderboard (1/3 width on desktop) -->
-            <div class="bg-slate-800 rounded-2xl shadow-xl p-6 border border-slate-700 flex flex-col justify-between min-h-[420px]">
+            <div class="bg-[#141416] rounded-2xl shadow-xl p-6 border border-zinc-800/80 flex flex-col justify-between min-h-[420px]">
                 <div>
-                    <h2 class="text-lg font-bold text-slate-200 mb-4 flex items-center justify-between border-b border-slate-700 pb-2">
+                    <h2 class="text-xs font-bold text-zinc-400 uppercase tracking-widest mb-4 flex items-center justify-between border-b border-zinc-800/60 pb-2">
                         <span>Leaderboard</span>
-                        <span class="text-xs font-normal text-slate-400">Goal: 100</span>
+                        <span>Goal: 100</span>
                     </h2>
                     
                     <!-- Dynamic Leaderboard list -->
@@ -68,22 +83,22 @@
                 </div>
 
                 <!-- Yesterday's Results -->
-                <div class="border-t border-slate-700/60 pt-3 mt-3">
+                <div class="border-t border-zinc-800/60 pt-3 mt-3">
                     <div class="flex items-center justify-between mb-2">
-                        <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Yesterday's Results</h3>
-                        <span id="yesterday-date" class="text-[10px] font-medium text-slate-500"></span>
+                        <h3 class="text-xs font-bold text-zinc-400 uppercase tracking-widest">Yesterday's Results</h3>
+                        <span id="yesterday-date" class="text-[10px] font-bold text-zinc-500"></span>
                     </div>
-                    <div id="yesterday-list" class="space-y-2 max-h-[120px] overflow-y-auto pr-1 text-slate-300">
+                    <div id="yesterday-list" class="space-y-2 max-h-[120px] overflow-y-auto pr-1 text-zinc-300">
                         <!-- Dynamically populated -->
                     </div>
                 </div>
 
                 <!-- Add Friend Section -->
-                <div class="border-t border-slate-700/60 pt-4 mt-4">
-                    <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Add Friend</h3>
+                <div class="border-t border-zinc-800/60 pt-4 mt-4">
+                    <h3 class="text-xs font-bold text-zinc-400 uppercase tracking-widest mb-2">Add Friend</h3>
                     <form onsubmit="handleAddFriend(event)" class="flex gap-2">
-                        <input id="new-friend-name" type="text" placeholder="Friend's name..." required class="flex-1 bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-cyan-500 text-slate-100 placeholder-slate-500" />
-                        <button type="submit" class="bg-slate-700 hover:bg-slate-600 active:scale-95 transition-all text-slate-200 px-4 py-2 rounded-lg text-sm font-bold shadow-md">
+                        <input id="new-friend-name" type="text" placeholder="Friend's name..." required class="flex-1 bg-black border border-zinc-800 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-[#ccff00] text-zinc-100 placeholder-zinc-600" />
+                        <button type="submit" class="bg-zinc-800 hover:bg-zinc-700 active:scale-95 transition-all text-zinc-200 px-4 py-2 rounded-lg text-sm font-bold shadow-md">
                             Add
                         </button>
                     </form>
@@ -92,40 +107,44 @@
             
         </div>
 
-        <!-- Connection Settings and Status Footer -->
-        <div class="flex flex-col items-center gap-3 mt-2">
-            <!-- Connection Status indicator -->
-            <div id="status" class="text-center text-xs text-slate-500">
+        <!-- Status Footer -->
+        <div class="flex flex-col items-center gap-3 mt-2 select-none">
+            <div id="status" class="text-center text-xs text-zinc-500 uppercase tracking-wider font-semibold">
                 Connecting to local network...
             </div>
+        </div>
+    </div>
 
-            <!-- Configurable Settings card -->
-            <div class="w-full max-w-md bg-slate-800/50 backdrop-blur rounded-xl border border-slate-700/50 p-4">
-                <button onclick="toggleSettings()" class="w-full flex items-center justify-between text-xs text-slate-400 hover:text-slate-200 transition-colors focus:outline-none">
-                    <span class="flex items-center gap-1.5 font-bold uppercase tracking-wider text-[10px]">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 text-cyan-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                        </svg>
-                        Backend Connection Settings
-                    </span>
-                    <span id="settings-toggle-icon" class="text-[10px]">▼</span>
-                </button>
-                
-                <div id="settings-content" class="hidden mt-3 pt-3 border-t border-slate-700/50 space-y-3">
-                    <div>
-                        <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wide mb-1" for="settings-api-url">API Endpoint URL</label>
-                        <input id="settings-api-url" type="text" class="w-full bg-slate-900 border border-slate-750 rounded-lg px-2.5 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-cyan-500" />
-                        <span class="text-[10px] text-slate-500 block mt-1">Change this to your laptop's tunnel address (e.g. Cloudflare/ngrok) to sync from GitHub Pages.</span>
-                    </div>
-                    <div class="flex gap-2 justify-end">
-                        <button onclick="resetSettings()" class="text-xs text-slate-400 hover:text-slate-200 transition-colors px-2 py-1">
-                            Reset to Default
-                        </button>
-                        <button onclick="saveSettings()" class="bg-cyan-600 hover:bg-cyan-500 active:scale-95 transition-all text-slate-100 px-3.5 py-1.5 rounded-lg text-xs font-bold shadow-md">
-                            Apply & Reconnect
-                        </button>
-                    </div>
+    <!-- Developer Settings Modal Overlay (Hidden by Default) -->
+    <div id="settings-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center hidden">
+        <div class="bg-zinc-900 border border-zinc-800 rounded-2xl p-6 w-full max-w-md shadow-2xl relative mx-4">
+            <button onclick="toggleSettingsModal()" class="absolute top-4 right-4 text-zinc-500 hover:text-zinc-300 transition-colors focus:outline-none" title="Close">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+            
+            <h3 class="text-lg font-bold text-zinc-200 uppercase tracking-wider mb-4 flex items-center gap-2 font-display">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-[#ccff00]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+                Developer Settings
+            </h3>
+            
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-[10px] font-bold text-zinc-400 uppercase tracking-wide mb-1" for="settings-api-url">API Endpoint URL</label>
+                    <input id="settings-api-url" type="text" class="w-full bg-black border border-zinc-800 rounded-lg px-3 py-2 text-xs text-zinc-200 focus:outline-none focus:border-[#ccff00]" />
+                    <span class="text-[10px] text-zinc-500 block mt-1.5 leading-normal">Configure the API address to sync counts. Double-click the main header or press <b>Ctrl+Shift+S</b> to toggle this menu.</span>
+                </div>
+                <div class="flex gap-2 justify-end pt-2">
+                    <button onclick="resetSettings()" class="text-xs text-zinc-500 hover:text-zinc-300 transition-colors px-3 py-2">
+                        Reset to Default
+                    </button>
+                    <button onclick="saveSettings()" class="bg-[#ccff00] hover:bg-[#b8e600] active:scale-95 transition-all text-black px-4 py-2 rounded-lg text-xs font-black shadow-lg shadow-[#ccff00]/10">
+                        Apply & Reconnect
+                    </button>
                 </div>
             </div>
         </div>
@@ -142,12 +161,12 @@
         function getApiUrl() {
             const saved = localStorage.getItem('pushups_api_url');
             if (saved) return saved;
-            // Default to the stable public tunnel address
+            // Default stable tunnel URL
             return 'https://brodie-ned-push.loca.lt/api/counts';
         }
         let API_URL = getApiUrl();
 
-        // Helper function to get current cycle date string in Adelaide time zone
+        // Helper function to get Adelaide Date Key
         function getAdelaideDateKey() {
             const options = { timeZone: 'Australia/Adelaide', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', hour12: false };
             const formatter = new Intl.DateTimeFormat('en-AU', options);
@@ -159,7 +178,6 @@
             let day = parseInt(map.day, 10);
             const hour = parseInt(map.hour, 10);
 
-            // Resets exactly at 12:00 PM (noon). Hours 0-11 belong to yesterday's cycle
             if (hour < 12) {
                 day -= 1; 
             }
@@ -185,7 +203,6 @@
                         currentData.yesterday = data.yesterday || {};
                         currentData.yesterdayCycleKey = data.yesterdayCycleKey || "";
                     } else {
-                        // Resets all counts at 12pm Adelaide Time (Noon)
                         const previousUsers = data.users || {};
                         const resetUsers = {};
                         for (const u in previousUsers) {
@@ -201,11 +218,11 @@
                     
                     updateUI();
                     statusEl.innerText = "Live Synced via Local Server";
-                    statusEl.className = "text-center text-xs text-emerald-400";
+                    statusEl.className = "text-center text-xs text-emerald-400 uppercase tracking-wider font-semibold";
                 }
             } catch (err) {
                 statusEl.innerText = "Syncing paused (checking connection...)";
-                statusEl.className = "text-center text-xs text-amber-500";
+                statusEl.className = "text-center text-xs text-amber-500 uppercase tracking-wider font-semibold";
             }
         }
 
@@ -249,15 +266,15 @@
             const userNames = Object.keys(users);
             
             if (userNames.length === 0) {
-                userSelectionEl.innerHTML = `<span class="text-xs text-slate-500 italic">No friends added yet. Add one in the sidebar!</span>`;
+                userSelectionEl.innerHTML = `<span class="text-xs text-zinc-500 italic">No friends added yet. Add one in the sidebar!</span>`;
             } else {
                 userNames.forEach(name => {
                     const isActive = selectedUser === name;
                     const btn = document.createElement('button');
-                    btn.className = `px-4 py-2.5 rounded-lg font-bold text-sm border transition-all active:scale-95 ${
+                    btn.className = `px-4 py-2.5 rounded-lg font-display font-bold text-base border transition-all active:scale-95 ${
                         isActive 
-                            ? 'bg-gradient-to-r from-emerald-500 to-cyan-500 text-slate-900 border-transparent shadow-md' 
-                            : 'bg-slate-750 text-slate-300 border-slate-700 hover:bg-slate-700 hover:text-slate-200'
+                            ? 'bg-[#ccff00] text-black border-transparent shadow-md' 
+                            : 'bg-zinc-900 text-zinc-400 border-zinc-800 hover:bg-zinc-800 hover:text-zinc-200'
                     }`;
                     btn.innerText = name;
                     btn.onclick = () => selectUser(name);
@@ -272,13 +289,13 @@
 
             if (selectedUser && users[selectedUser] !== undefined) {
                 activeUserDisplay.innerText = `${selectedUser} (${users[selectedUser]} pushups)`;
-                activeUserDisplay.className = "text-2xl font-black bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent";
+                activeUserDisplay.className = "text-3xl font-display font-bold text-[#ccff00] tracking-wide";
                 btnPlus1.disabled = false;
                 btnPlus10.disabled = false;
             } else {
                 selectedUser = null; 
                 activeUserDisplay.innerText = "No profile selected";
-                activeUserDisplay.className = "text-2xl font-black text-slate-500";
+                activeUserDisplay.className = "text-3xl font-display font-bold text-zinc-600 tracking-wide";
                 btnPlus1.disabled = true;
                 btnPlus10.disabled = true;
             }
@@ -290,7 +307,7 @@
             const sortedUsers = Object.entries(users).sort((a, b) => b[1] - a[1]);
 
             if (sortedUsers.length === 0) {
-                leaderboardList.innerHTML = `<div class="text-center text-xs text-slate-500 italic py-6 border border-dashed border-slate-700 rounded-lg">No friends added yet.</div>`;
+                leaderboardList.innerHTML = `<div class="text-center text-xs text-zinc-500 italic py-6 border border-dashed border-zinc-800 rounded-lg">No friends added yet.</div>`;
             } else {
                 sortedUsers.forEach(([name, count]) => {
                     const percentage = Math.min((count / 100) * 100, 100);
@@ -298,31 +315,33 @@
                     const item = document.createElement('div');
                     item.className = `p-3 rounded-xl border flex flex-col gap-1.5 transition-all ${
                         selectedUser === name 
-                            ? 'bg-slate-700/30 border-cyan-500/40 shadow-inner' 
-                            : 'bg-slate-750/30 border-slate-750'
+                            ? 'bg-zinc-800/40 border-[#ccff00]/40 shadow-inner' 
+                            : 'bg-zinc-900/40 border-zinc-800/50'
                     }`;
 
-                    let progressColor = "from-rose-500 to-orange-500";
+                    let progressColor = "bg-zinc-700";
                     if (percentage >= 100) {
-                        progressColor = "from-emerald-400 to-cyan-400";
+                        progressColor = "bg-[#ccff00]";
                     } else if (percentage >= 50) {
-                        progressColor = "from-amber-400 to-emerald-400";
+                        progressColor = "bg-zinc-400";
+                    } else {
+                        progressColor = "bg-zinc-500";
                     }
 
                     item.innerHTML = `
                         <div class="flex justify-between items-center text-sm font-semibold">
-                            <span class="${selectedUser === name ? 'text-cyan-400 font-bold' : 'text-slate-300'}">${name}</span>
+                            <span class="${selectedUser === name ? 'text-[#ccff00] font-bold' : 'text-zinc-300'}">${name}</span>
                             <div class="flex items-center gap-2">
-                                <span class="text-slate-400">${count} <span class="text-xs text-slate-500">/ 100</span></span>
-                                <button onclick="handleRemoveFriend(event, '${name}')" class="text-slate-500 hover:text-rose-400 active:scale-95 transition-all px-1" title="Remove Friend">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" viewBox="0 0 20 20" fill="currentColor">
+                                <span class="text-zinc-400 font-display text-lg">${count} <span class="text-xs text-zinc-500">/ 100</span></span>
+                                <button onclick="handleRemoveFriend(event, '${name}')" class="text-zinc-500 hover:text-rose-500 active:scale-95 transition-all px-1" title="Remove Friend">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
                                         <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
                                     </svg>
                                 </button>
                             </div>
                         </div>
-                        <div class="w-full bg-slate-900 h-2 rounded-full overflow-hidden">
-                            <div class="h-full bg-gradient-to-r ${progressColor} transition-all duration-500" style="width: ${percentage}%"></div>
+                        <div class="w-full bg-zinc-950 h-2 rounded-full overflow-hidden border border-zinc-900">
+                            <div class="h-full ${progressColor} transition-all duration-500" style="width: ${percentage}%"></div>
                         </div>
                     `;
                     leaderboardList.appendChild(item);
@@ -344,37 +363,18 @@
             const sortedYesterday = Object.entries(yesterdayUsers).sort((a, b) => b[1] - a[1]);
 
             if (sortedYesterday.length === 0) {
-                yesterdayList.innerHTML = `<div class="text-[11px] text-slate-500 italic py-2 text-center">No history available yet.</div>`;
+                yesterdayList.innerHTML = `<div class="text-[11px] text-zinc-600 italic py-2 text-center">No history available yet.</div>`;
             } else {
                 sortedYesterday.forEach(([name, count]) => {
                     const row = document.createElement('div');
-                    row.className = "flex justify-between items-center text-xs py-1 border-b border-slate-700/30";
+                    row.className = "flex justify-between items-center text-xs py-1 border-b border-zinc-800/30";
                     row.innerHTML = `
-                        <span class="text-slate-400">${name}</span>
-                        <span class="font-bold text-slate-300">${count}</span>
+                        <span class="text-zinc-400">${name}</span>
+                        <span class="font-bold text-zinc-300 font-display text-sm">${count}</span>
                     `;
                     yesterdayList.appendChild(row);
                 });
             }
-        }
-
-        async function handleRemoveFriend(event, name) {
-            event.stopPropagation();
-            if (!confirm(`Are you sure you want to permanently remove "${name}"?`)) return;
-
-            if (currentData.users[name] !== undefined) {
-                delete currentData.users[name];
-            }
-            if (currentData.yesterday && currentData.yesterday[name] !== undefined) {
-                delete currentData.yesterday[name];
-            }
-
-            if (selectedUser === name) {
-                selectedUser = null;
-            }
-
-            updateUI();
-            await saveCounts(currentData.users);
         }
 
         function selectUser(name) {
@@ -408,17 +408,14 @@
             await saveCounts(currentData.users);
         }
 
-        // Collapsible Settings logic
-        function toggleSettings() {
-            const content = document.getElementById('settings-content');
-            const icon = document.getElementById('settings-toggle-icon');
-            if (content.classList.contains('hidden')) {
-                content.classList.remove('hidden');
-                icon.innerText = '▲';
+        // Secret settings modal triggers
+        function toggleSettingsModal() {
+            const modal = document.getElementById('settings-modal');
+            if (modal.classList.contains('hidden')) {
+                modal.classList.remove('hidden');
                 document.getElementById('settings-api-url').value = API_URL;
             } else {
-                content.classList.add('hidden');
-                icon.innerText = '▼';
+                modal.classList.add('hidden');
             }
         }
 
@@ -427,18 +424,27 @@
             if (!urlInput) return;
             localStorage.setItem('pushups_api_url', urlInput);
             API_URL = urlInput;
-            toggleSettings();
+            toggleSettingsModal();
             fetchCounts();
         }
 
-        // Reset to protocol default
         function resetSettings() {
             localStorage.removeItem('pushups_api_url');
             API_URL = getApiUrl();
             document.getElementById('settings-api-url').value = API_URL;
-            toggleSettings();
+            toggleSettingsModal();
             fetchCounts();
         }
+
+        // Bind secret shortcuts
+        document.getElementById('app-header').ondblclick = toggleSettingsModal;
+        
+        window.addEventListener('keydown', (e) => {
+            if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === 's') {
+                e.preventDefault();
+                toggleSettingsModal();
+            }
+        });
 
         // Live syncing setup
         setInterval(fetchCounts, 3000);
