@@ -7,64 +7,135 @@
     <!-- Tailwind CSS for sleek UI -->
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col items-center justify-center p-4">
+<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col items-center justify-center p-4 md:p-8">
 
-    <div class="w-full max-w-md bg-slate-800 rounded-2xl shadow-xl p-6 border border-slate-700">
-        <header class="text-center mb-8">
-            <h1 class="text-3xl font-extrabold tracking-tight bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">
+    <div class="w-full max-w-4xl flex flex-col gap-6">
+        <header class="text-center">
+            <h1 class="text-4xl font-extrabold tracking-tight bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">
                 Daily Pushup Challenge
             </h1>
-            <p class="text-slate-400 text-sm mt-2">Target: 100 pushups each day</p>
+            <p class="text-slate-400 text-sm mt-2 font-medium">Target: 100 pushups each day</p>
             <p class="text-xs text-amber-400 mt-1">Resets daily at 12:00 PM Adelaide Time</p>
         </header>
 
-        <!-- Users Grid -->
-        <div class="grid grid-cols-2 gap-4 mb-6">
-            <!-- Brodie's Card -->
-            <div class="bg-slate-750 p-4 rounded-xl border border-slate-700 flex flex-col items-center justify-between text-center">
-                <span class="font-bold text-lg text-slate-300">Brodie</span>
-                <div class="my-6">
-                    <span id="brodie-count" class="text-5xl font-black text-emerald-400">0</span>
-                    <span class="text-slate-500 text-sm block mt-1">/ 100</span>
+        <!-- Main Workspace Grid Layout -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            
+            <!-- Left Column: Selection and Actions (2/3 width on desktop) -->
+            <div class="md:col-span-2 bg-slate-800 rounded-2xl shadow-xl p-6 border border-slate-700 flex flex-col justify-between min-h-[350px]">
+                <div>
+                    <h2 class="text-lg font-bold text-slate-200 mb-4 flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                        Select Who You Are:
+                    </h2>
+                    
+                    <!-- Profile selection area -->
+                    <div id="user-selection" class="flex flex-wrap gap-2.5 mb-8">
+                        <!-- Dynamically populated buttons -->
+                    </div>
                 </div>
-                <button id="brodie-btn" onclick="increment('brodie')" class="w-full bg-emerald-500 hover:bg-emerald-600 active:scale-95 transition-all text-slate-900 font-bold py-4 rounded-lg text-2xl shadow-lg shadow-emerald-500/20 disabled:opacity-50">
-                    +1
-                </button>
+
+                <div class="border-t border-slate-700/60 pt-6">
+                    <div class="text-center mb-6">
+                        <span class="text-slate-400 text-xs block uppercase tracking-wider font-semibold mb-1">Selected Active Profile</span>
+                        <span id="active-user-display" class="text-2xl font-black text-slate-500">No profile selected</span>
+                    </div>
+
+                    <!-- Large Action Buttons -->
+                    <div class="grid grid-cols-2 gap-4">
+                        <button id="btn-plus-1" onclick="incrementActive(1)" disabled class="w-full bg-emerald-500 hover:bg-emerald-600 active:scale-95 disabled:hover:bg-slate-700 disabled:bg-slate-700 disabled:opacity-30 disabled:scale-100 transition-all text-slate-900 disabled:text-slate-500 font-black py-5 rounded-xl text-3xl shadow-lg shadow-emerald-500/10">
+                            +1
+                        </button>
+                        <button id="btn-plus-10" onclick="incrementActive(10)" disabled class="w-full bg-cyan-500 hover:bg-cyan-600 active:scale-95 disabled:hover:bg-slate-700 disabled:bg-slate-700 disabled:opacity-30 disabled:scale-100 transition-all text-slate-900 disabled:text-slate-500 font-black py-5 rounded-xl text-3xl shadow-lg shadow-cyan-500/10">
+                            +10
+                        </button>
+                    </div>
+                </div>
             </div>
 
-            <!-- Ned's Card -->
-            <div class="bg-slate-750 p-4 rounded-xl border border-slate-700 flex flex-col items-center justify-between text-center">
-                <span class="font-bold text-lg text-slate-300">Ned</span>
-                <div class="my-6">
-                    <span id="ned-count" class="text-5xl font-black text-cyan-400">0</span>
-                    <span class="text-slate-500 text-sm block mt-1">/ 100</span>
+            <!-- Right Column: Sidebar / Leaderboard (1/3 width on desktop) -->
+            <div class="bg-slate-800 rounded-2xl shadow-xl p-6 border border-slate-700 flex flex-col justify-between min-h-[350px]">
+                <div>
+                    <h2 class="text-lg font-bold text-slate-200 mb-4 flex items-center justify-between border-b border-slate-700 pb-2">
+                        <span>Leaderboard</span>
+                        <span class="text-xs font-normal text-slate-400">Goal: 100</span>
+                    </h2>
+                    
+                    <!-- Dynamic Leaderboard list -->
+                    <div id="leaderboard-list" class="space-y-3.5 max-h-[220px] overflow-y-auto pr-1">
+                        <!-- Dynamically populated items -->
+                    </div>
                 </div>
-                <button id="ned-btn" onclick="increment('ned')" class="w-full bg-cyan-500 hover:bg-cyan-600 active:scale-95 transition-all text-slate-900 font-bold py-4 rounded-lg text-2xl shadow-lg shadow-cyan-500/20 disabled:opacity-50">
-                    +1
-                </button>
+
+                <!-- Add Friend Section -->
+                <div class="border-t border-slate-700/60 pt-4 mt-4">
+                    <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Add Friend</h3>
+                    <form onsubmit="handleAddFriend(event)" class="flex gap-2">
+                        <input id="new-friend-name" type="text" placeholder="Friend's name..." required class="flex-1 bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-cyan-500 text-slate-100 placeholder-slate-500" />
+                        <button type="submit" class="bg-slate-700 hover:bg-slate-600 active:scale-95 transition-all text-slate-200 px-4 py-2 rounded-lg text-sm font-bold shadow-md">
+                            Add
+                        </button>
+                    </form>
+                </div>
             </div>
+            
         </div>
 
-        <!-- Connection Status -->
-        <div id="status" class="text-center text-xs text-slate-500 border-t border-slate-700 pt-4">
-            Connecting to sync network...
+        <!-- Connection Settings and Status Footer -->
+        <div class="flex flex-col items-center gap-3 mt-2">
+            <!-- Connection Status indicator -->
+            <div id="status" class="text-center text-xs text-slate-500">
+                Connecting to local network...
+            </div>
+
+            <!-- Configurable Settings card -->
+            <div class="w-full max-w-md bg-slate-800/50 backdrop-blur rounded-xl border border-slate-700/50 p-4">
+                <button onclick="toggleSettings()" class="w-full flex items-center justify-between text-xs text-slate-400 hover:text-slate-200 transition-colors focus:outline-none">
+                    <span class="flex items-center gap-1.5 font-bold uppercase tracking-wider text-[10px]">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 text-cyan-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        </svg>
+                        Backend Connection Settings
+                    </span>
+                    <span id="settings-toggle-icon" class="text-[10px]">▼</span>
+                </button>
+                
+                <div id="settings-content" class="hidden mt-3 pt-3 border-t border-slate-700/50 space-y-3">
+                    <div>
+                        <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wide mb-1" for="settings-api-url">API Endpoint URL</label>
+                        <input id="settings-api-url" type="text" class="w-full bg-slate-900 border border-slate-750 rounded-lg px-2.5 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-cyan-500" />
+                        <span class="text-[10px] text-slate-500 block mt-1">Change this to your laptop's tunnel address (e.g. Cloudflare/ngrok) to sync from GitHub Pages.</span>
+                    </div>
+                    <div class="flex gap-2 justify-end">
+                        <button onclick="resetSettings()" class="text-xs text-slate-400 hover:text-slate-200 transition-colors px-2 py-1">
+                            Reset to Default
+                        </button>
+                        <button onclick="saveSettings()" class="bg-cyan-600 hover:bg-cyan-500 active:scale-95 transition-all text-slate-100 px-3.5 py-1.5 rounded-lg text-xs font-bold shadow-md">
+                            Apply & Reconnect
+                        </button>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
     <script>
-        // Your custom JSONBin configuration
-        const BIN_ID = '6a3d9cb9f5f4af5e29313214';
-        const API_URL = `https://api.jsonbin.io/v3/b/${BIN_ID}`;
-        
-        // ⚠️ PASTE YOUR JSONBIN MASTER API KEY HERE BETWEEN THE QUOTES:
-        const MASTER_KEY = 'YOUR_MASTER_KEY_HERE'; 
-
-        let currentData = { brodie: 0, ned: 0 };
+        let currentData = { cycleKey: "", users: {} };
         let isUpdating = false;
+        let selectedUser = null;
 
-        const brodieEl = document.getElementById('brodie-count');
-        const nedEl = document.getElementById('ned-count');
         const statusEl = document.getElementById('status');
+
+        // Dynamic backend URL determination
+        function getApiUrl() {
+            const saved = localStorage.getItem('pushups_api_url');
+            if (saved) return saved;
+            return window.location.protocol.startsWith('http') 
+                ? '/api/counts' 
+                : 'http://localhost:3000/api/counts';
+        }
+        let API_URL = getApiUrl();
 
         // Helper function to get current cycle date string in Adelaide time zone
         function getAdelaideDateKey() {
@@ -85,62 +156,54 @@
             return `${year}-${month}-${day}`;
         }
 
-        // Fetch live counts from JSONBin
+        // Fetch counts from backend
         async function fetchCounts() {
             if (isUpdating) return; 
             try {
-                const response = await fetch(API_URL, {
-                    method: 'GET',
-                    headers: {
-                        'X-Master-Key': MASTER_KEY,
-                        'X-Bin-Meta': 'false' // Tells JSONBin to return just our data, no extra metadata
-                    }
-                });
+                const response = await fetch(API_URL);
                 
                 if (response.ok) {
                     const data = await response.json();
                     const currentCycle = getAdelaideDateKey();
                     
                     if (data.cycleKey === currentCycle) {
-                        currentData.brodie = data.brodie || 0;
-                        currentData.ned = data.ned || 0;
+                        currentData.users = data.users || {};
                     } else {
-                        // Time has crossed 12pm Adelaide time since last update. Reset!
-                        currentData.brodie = 0;
-                        currentData.ned = 0;
-                        await saveCounts(0, 0); 
+                        // Resets all counts at 12pm Adelaide Time
+                        currentData.users = data.users || {};
+                        for (const u in currentData.users) {
+                            currentData.users[u] = 0;
+                        }
+                        await saveCounts(currentData.users); 
                     }
                     
                     updateUI();
-                    statusEl.innerText = "Live Synced via Private Cloud";
-                    statusEl.className = "text-center text-xs text-emerald-400 border-t border-slate-700 pt-4";
+                    statusEl.innerText = "Live Synced via Local Server";
+                    statusEl.className = "text-center text-xs text-emerald-400";
                 }
             } catch (err) {
                 statusEl.innerText = "Syncing paused (checking connection...)";
-                statusEl.className = "text-center text-xs text-amber-500 border-t border-slate-700 pt-4";
+                statusEl.className = "text-center text-xs text-amber-500";
             }
         }
 
-        // Save counts to JSONBin using PUT (replaces the whole file)
-        async function saveCounts(brodieVal, nedVal) {
+        // Save counts to backend
+        async function saveCounts(usersObj) {
             isUpdating = true;
             const payload = {
                 cycleKey: getAdelaideDateKey(),
-                brodie: brodieVal,
-                ned: nedVal
+                users: usersObj
             };
 
             try {
                 await fetch(API_URL, {
                     method: 'PUT',
                     headers: {
-                        'Content-Type': 'application/json',
-                        'X-Master-Key': MASTER_KEY
+                        'Content-Type': 'application/json'
                     },
                     body: JSON.stringify(payload)
                 });
-                currentData.brodie = brodieVal;
-                currentData.ned = nedVal;
+                currentData.users = usersObj;
                 updateUI();
             } catch (err) {
                 console.error("Failed to save data:", err);
@@ -149,27 +212,155 @@
             }
         }
 
+        // Update the layout and leaderboard
         function updateUI() {
-            brodieEl.innerText = currentData.brodie;
-            nedEl.innerText = currentData.ned;
-        }
-
-        // Handle button clicks
-        async function increment(user) {
-            if (user === 'brodie') {
-                currentData.brodie += 1;
+            // Render selection buttons
+            const userSelectionEl = document.getElementById('user-selection');
+            userSelectionEl.innerHTML = '';
+            
+            const users = currentData.users || {};
+            const userNames = Object.keys(users);
+            
+            if (userNames.length === 0) {
+                userSelectionEl.innerHTML = `<span class="text-xs text-slate-500 italic">No friends added yet. Add one in the sidebar!</span>`;
             } else {
-                currentData.ned += 1;
+                userNames.forEach(name => {
+                    const isActive = selectedUser === name;
+                    const btn = document.createElement('button');
+                    btn.className = `px-4 py-2.5 rounded-lg font-bold text-sm border transition-all active:scale-95 ${
+                        isActive 
+                            ? 'bg-gradient-to-r from-emerald-500 to-cyan-500 text-slate-900 border-transparent shadow-md' 
+                            : 'bg-slate-750 text-slate-300 border-slate-700 hover:bg-slate-700 hover:text-slate-200'
+                    }`;
+                    btn.innerText = name;
+                    btn.onclick = () => selectUser(name);
+                    userSelectionEl.appendChild(btn);
+                });
             }
-            updateUI(); // Optimistic update on screen instantly
 
-            await saveCounts(currentData.brodie, currentData.ned);
+            // Update active user state and buttons
+            const activeUserDisplay = document.getElementById('active-user-display');
+            const btnPlus1 = document.getElementById('btn-plus-1');
+            const btnPlus10 = document.getElementById('btn-plus-10');
+
+            if (selectedUser && users[selectedUser] !== undefined) {
+                activeUserDisplay.innerText = `${selectedUser} (${users[selectedUser]} pushups)`;
+                activeUserDisplay.className = "text-2xl font-black bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent";
+                btnPlus1.disabled = false;
+                btnPlus10.disabled = false;
+            } else {
+                selectedUser = null; 
+                activeUserDisplay.innerText = "No profile selected";
+                activeUserDisplay.className = "text-2xl font-black text-slate-500";
+                btnPlus1.disabled = true;
+                btnPlus10.disabled = true;
+            }
+
+            // Render Leaderboard
+            const leaderboardList = document.getElementById('leaderboard-list');
+            leaderboardList.innerHTML = '';
+
+            const sortedUsers = Object.entries(users).sort((a, b) => b[1] - a[1]);
+
+            if (sortedUsers.length === 0) {
+                leaderboardList.innerHTML = `<div class="text-center text-xs text-slate-500 italic py-6 border border-dashed border-slate-700 rounded-lg">No friends added yet.</div>`;
+            } else {
+                sortedUsers.forEach(([name, count]) => {
+                    const percentage = Math.min((count / 100) * 100, 100);
+                    
+                    const item = document.createElement('div');
+                    item.className = `p-3 rounded-xl border flex flex-col gap-1.5 transition-all ${
+                        selectedUser === name 
+                            ? 'bg-slate-700/30 border-cyan-500/40 shadow-inner' 
+                            : 'bg-slate-750/30 border-slate-750'
+                    }`;
+
+                    let progressColor = "from-rose-500 to-orange-500";
+                    if (percentage >= 100) {
+                        progressColor = "from-emerald-400 to-cyan-400";
+                    } else if (percentage >= 50) {
+                        progressColor = "from-amber-400 to-emerald-400";
+                    }
+
+                    item.innerHTML = `
+                        <div class="flex justify-between items-center text-sm font-semibold">
+                            <span class="${selectedUser === name ? 'text-cyan-400 font-bold' : 'text-slate-300'}">${name}</span>
+                            <span class="text-slate-400">${count} <span class="text-xs text-slate-500">/ 100</span></span>
+                        </div>
+                        <div class="w-full bg-slate-900 h-2 rounded-full overflow-hidden">
+                            <div class="h-full bg-gradient-to-r ${progressColor} transition-all duration-500" style="width: ${percentage}%"></div>
+                        </div>
+                    `;
+                    leaderboardList.appendChild(item);
+                });
+            }
         }
 
-        // Auto-refresh data from cloud every 3 seconds
+        function selectUser(name) {
+            selectedUser = name;
+            updateUI();
+        }
+
+        async function incrementActive(amount) {
+            if (!selectedUser || currentData.users[selectedUser] === undefined) return;
+            currentData.users[selectedUser] += amount;
+            updateUI(); // Optimistic update
+            await saveCounts(currentData.users);
+        }
+
+        async function handleAddFriend(event) {
+            event.preventDefault();
+            const input = document.getElementById('new-friend-name');
+            const name = input.value.trim();
+            if (!name) return;
+
+            if (currentData.users[name] !== undefined) {
+                alert(`Friend "${name}" already exists!`);
+                return;
+            }
+
+            currentData.users[name] = 0;
+            input.value = '';
+            selectedUser = name; // Auto-select new profile
+            
+            updateUI();
+            await saveCounts(currentData.users);
+        }
+
+        // Collapsible Settings logic
+        function toggleSettings() {
+            const content = document.getElementById('settings-content');
+            const icon = document.getElementById('settings-toggle-icon');
+            if (content.classList.contains('hidden')) {
+                content.classList.remove('hidden');
+                icon.innerText = '▲';
+                document.getElementById('settings-api-url').value = API_URL;
+            } else {
+                content.classList.add('hidden');
+                icon.innerText = '▼';
+            }
+        }
+
+        function saveSettings() {
+            const urlInput = document.getElementById('settings-api-url').value.trim();
+            if (!urlInput) return;
+            localStorage.setItem('pushups_api_url', urlInput);
+            API_URL = urlInput;
+            toggleSettings();
+            fetchCounts();
+        }
+
+        // Reset to protocol default
+        function resetSettings() {
+            localStorage.removeItem('pushups_api_url');
+            API_URL = getApiUrl();
+            document.getElementById('settings-api-url').value = API_URL;
+            toggleSettings();
+            fetchCounts();
+        }
+
+        // Live syncing setup
         setInterval(fetchCounts, 3000);
-        
-        // Initial load
         fetchCounts();
     </script>
 </body>
