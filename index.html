@@ -160,7 +160,11 @@
         async function fetchCounts() {
             if (isUpdating) return; 
             try {
-                const response = await fetch(API_URL);
+                const response = await fetch(API_URL, {
+                    headers: {
+                        'Bypass-Tunnel-Reminder': 'true'
+                    }
+                });
                 
                 if (response.ok) {
                     const data = await response.json();
@@ -199,7 +203,8 @@
                 await fetch(API_URL, {
                     method: 'PUT',
                     headers: {
-                        'Content-Type': 'application/json'
+                        'Content-Type': 'application/json',
+                        'Bypass-Tunnel-Reminder': 'true'
                     },
                     body: JSON.stringify(payload)
                 });
