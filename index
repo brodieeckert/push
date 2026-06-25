@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pushup Tracker</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gun/gun.js"></script>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col items-center justify-center p-4">
+
+    <div class="w-full max-w-md bg-slate-800 rounded-2xl shadow-xl p-6 border border-slate-700">
+        <header class="text-center mb-8">
+            <h1 class="text-3xl font-extrabold tracking-tight bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">
+                Daily Pushup Challenge
+            </h1>
+            <p class="text-slate-400 text-sm mt-2">Target: 100 pushups each day</p>
+            <p class="text-xs text-amber-400 mt-1">Resets daily at 12:00 PM Adelaide Time</p>
+        </header>
+
+        <div class="grid grid-cols-2 gap-4 mb-6">
+            <div class="bg-slate-750 p-4 rounded-xl border border-slate-700 flex flex-col items-center justify-between text-center">
+                <span class="font-bold text-lg text-slate-300">Brodie</span>
+                <div class="my-6">
+                    <span id="brodie-count" class="text-5xl font-black text-emerald-400">0</span>
+                    <span class="text-slate-500 text-sm block mt-1">/ 100</span>
+                </div>
+                <button onclick="increment('brodie')" class="w-full bg-emerald-500 hover:bg-emerald-600 active:scale-95 transition-all text-slate-900 font-bold py-4 rounded-lg text-2xl shadow-lg shadow-emerald-500/20">
+                    +1
+                </button>
+            </div>
+
+            <div class="bg-slate-750 p-4 rounded-xl border border-slate-700 flex flex-col items-center justify-between text-center">
+                <span class="font-bold text-lg text-slate-300">Ned</span>
+                <div class="my-6">
+                    <span id="ned-count" class="text-5xl font-black text-cyan-400">0</span>
+                    <span class="text-slate-500 text-sm block mt-1">/ 100</span>
+                </div>
+                <button onclick="increment('ned')" class="w-full bg-cyan-500 hover:bg-cyan-600 active:scale-95 transition-all text-slate-900 font-bold py-4 rounded-lg text-2xl shadow-lg shadow-cyan-500/20">
+                    +1
+                </button>
+            </div>
+        </div>
+
+        <div class="text-center text-xs text-slate-500 border-t border-slate-700 pt-4">
+            Syncing live via P2P mesh network
+        </div>
+    </div>
+
+    <script>
+        // Initialize GunDB using public dWeb relays for decentralised, backend-less sync
+        const gun = Gun(['https://gun-manhattan.herokuapp.com/gun', 'https://peer.wall.org/gun']);
+        // Create a unique namespace for this specific tracker instance
+        const pushupApp = gun.get('brodie_ned_pushups_v1');
+
+        let currentData = { brodie: 0, ned: 0 };
+
+        // DOM elements
+        const brodieEl = document.getElementById('brodie-count');
+        const nedEl = document.getElementById('ned-count');
+
+        // Listen for real-time changes from either user
+        pushupApp.on((data) => {
+            if (data) {
+                currentData.brodie = data.brodie || 0;
+                currentData.ned = data.ned || 0;
+                
+                brodieEl.innerText = currentData.brodie;
+                nedEl.innerText = currentData.ned;
+            }
+        });
+
+        // Increment counts inside GunDB
+        function increment(user) {
+            const newCount = (currentData[user] || 0) + 1;
+            pushupApp.put({ [user]: newCount });
+        }
+
+        // Helper function to get current date string in Adelaide time zone
+        function getAdelaideDateKey() {
+            const options = { timeZone: 'Australia/Adelaide', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', hour12: false };
+            const formatter = new Intl.DateTimeFormat('en-AU', options);
+            const parts = formatter.formatToParts(new Date());
+            
+            const map = Object.fromEntries(parts.map(p => [p.type, p.value]));
+            const year = map.year;
+            const month = map.month;
+            let day = parseInt(map.day, 10);
+            const hour = parseInt(map.hour, 10);
+
+            // Because the reset is exactly at 12:00 PM (noon), any hour BEFORE 12 PM 
+            // belongs to the "pushup day" that started yesterday at noon.
+            // If it's 12:00 PM or later, it's the current calendar day's cycle.
+            if (hour < 12) {
+                day -= 1; 
+            }
+
+            // Return a distinct string key unique to the current 24-hour cycle window
+            return `${year}-${month}-${day}`;
+        }
+
+        // Track the current cycle window locally
+        let activeCycleKey = localStorage.getItem('pushup_cycle_key') || getAdelaideDateKey();
+        localStorage.setItem('pushup_cycle_key', activeCycleKey);
+
+        // Check if the 12:00 PM Adelaide reset window has crossed
+        function checkReset() {
+            const currentCycleKey = getAdelaideDateKey();
+            if (currentCycleKey !== activeCycleKey) {
+                // Window has shifted past 12:00 PM Adelaide time. Reset the dataset.
+                pushupApp.put({ brodie: 0, ned: 0 });
+                activeCycleKey = currentCycleKey;
+                localStorage.setItem('pushup_cycle_key', activeCycleKey);
+            }
+        }
+
+        // Check for resets every 5 seconds
+        setInterval(checkReset, 5000);
+        checkReset();
+    </script>
+</body>
+</html>
