@@ -33,7 +33,7 @@ const server = http.createServer((req, res) => {
     // Enable CORS for all routes (to support running client from file:// or other local servers)
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, PUT, OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Bypass-Tunnel-Reminder');
 
     // Handle OPTIONS preflight requests
     if (req.method === 'OPTIONS') {
