@@ -27,7 +27,7 @@
                     <span id="brodie-count" class="text-5xl font-black text-emerald-400">0</span>
                     <span class="text-slate-500 text-sm block mt-1">/ 100</span>
                 </div>
-                <button id="brodie-btn" onclick="increment('brodie')" class="w-full bg-emerald-500 hover:bg-emerald-600 active:scale-95 transition-all text-slate-900 font-bold py-4 rounded-lg text-2xl shadow-lg">
+                <button id="brodie-btn" onclick="increment('brodie')" class="w-full bg-emerald-500 hover:bg-emerald-600 active:scale-95 transition-all text-slate-900 font-bold py-4 rounded-lg text-2xl shadow-lg shadow-emerald-500/20 disabled:opacity-50">
                     +1
                 </button>
             </div>
@@ -39,7 +39,7 @@
                     <span id="ned-count" class="text-5xl font-black text-cyan-400">0</span>
                     <span class="text-slate-500 text-sm block mt-1">/ 100</span>
                 </div>
-                <button id="ned-btn" onclick="increment('ned')" class="w-full bg-cyan-500 hover:bg-cyan-600 active:scale-95 transition-all text-slate-900 font-bold py-4 rounded-lg text-2xl shadow-lg">
+                <button id="ned-btn" onclick="increment('ned')" class="w-full bg-cyan-500 hover:bg-cyan-600 active:scale-95 transition-all text-slate-900 font-bold py-4 rounded-lg text-2xl shadow-lg shadow-cyan-500/20 disabled:opacity-50">
                     +1
                 </button>
             </div>
@@ -57,7 +57,7 @@
         const API_URL = `https://api.jsonbin.io/v3/b/${BIN_ID}`;
         
         // ⚠️ PASTE YOUR JSONBIN MASTER API KEY HERE BETWEEN THE QUOTES:
-        const MASTER_KEY = '$2a$10$IV9Wnvb0AudLEU/mpi3YfOB4ZicLd1drylZp3fzQ4RK6gnMLkTtxO'; 
+        const MASTER_KEY = 'YOUR_MASTER_KEY_HERE'; 
 
         let currentData = { brodie: 0, ned: 0 };
         let isUpdating = false;
