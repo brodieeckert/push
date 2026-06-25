@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pushup Tracker</title>
+    <!-- Tailwind CSS for sleek UI -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/gun/gun.js"></script>
 </head>
 <body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col items-center justify-center p-4">
 
@@ -18,65 +18,51 @@
             <p class="text-xs text-amber-400 mt-1">Resets daily at 12:00 PM Adelaide Time</p>
         </header>
 
+        <!-- Users Grid -->
         <div class="grid grid-cols-2 gap-4 mb-6">
+            <!-- Brodie's Card -->
             <div class="bg-slate-750 p-4 rounded-xl border border-slate-700 flex flex-col items-center justify-between text-center">
                 <span class="font-bold text-lg text-slate-300">Brodie</span>
                 <div class="my-6">
                     <span id="brodie-count" class="text-5xl font-black text-emerald-400">0</span>
                     <span class="text-slate-500 text-sm block mt-1">/ 100</span>
                 </div>
-                <button onclick="increment('brodie')" class="w-full bg-emerald-500 hover:bg-emerald-600 active:scale-95 transition-all text-slate-900 font-bold py-4 rounded-lg text-2xl shadow-lg shadow-emerald-500/20">
+                <button id="brodie-btn" onclick="increment('brodie')" class="w-full bg-emerald-500 hover:bg-emerald-600 active:scale-95 transition-all text-slate-900 font-bold py-4 rounded-lg text-2xl shadow-lg shadow-emerald-500/20 disabled:opacity-50">
                     +1
                 </button>
             </div>
 
+            <!-- Ned's Card -->
             <div class="bg-slate-750 p-4 rounded-xl border border-slate-700 flex flex-col items-center justify-between text-center">
                 <span class="font-bold text-lg text-slate-300">Ned</span>
                 <div class="my-6">
                     <span id="ned-count" class="text-5xl font-black text-cyan-400">0</span>
                     <span class="text-slate-500 text-sm block mt-1">/ 100</span>
                 </div>
-                <button onclick="increment('ned')" class="w-full bg-cyan-500 hover:bg-cyan-600 active:scale-95 transition-all text-slate-900 font-bold py-4 rounded-lg text-2xl shadow-lg shadow-cyan-500/20">
+                <button id="ned-btn" onclick="increment('ned')" class="w-full bg-cyan-500 hover:bg-cyan-600 active:scale-95 transition-all text-slate-900 font-bold py-4 rounded-lg text-2xl shadow-lg shadow-cyan-500/20 disabled:opacity-50">
                     +1
                 </button>
             </div>
         </div>
 
-        <div class="text-center text-xs text-slate-500 border-t border-slate-700 pt-4">
-            Syncing live via P2P mesh network
+        <!-- Connection Status -->
+        <div id="status" class="text-center text-xs text-slate-500 border-t border-slate-700 pt-4">
+            Connecting to sync network...
         </div>
     </div>
 
     <script>
-        // Initialize GunDB using public dWeb relays for decentralised, backend-less sync
-        const gun = Gun(['https://gun-manhattan.herokuapp.com/gun', 'https://peer.wall.org/gun']);
-        // Create a unique namespace for this specific tracker instance
-        const pushupApp = gun.get('brodie_ned_pushups_v1');
+        // Generated a completely unique public bucket endpoint for Brodie and Ned
+        const API_URL = 'https://kvdb.io/97XunS6wHks2wU2rDndq75/pushups_v2';
 
         let currentData = { brodie: 0, ned: 0 };
+        let isUpdating = false;
 
-        // DOM elements
         const brodieEl = document.getElementById('brodie-count');
         const nedEl = document.getElementById('ned-count');
+        const statusEl = document.getElementById('status');
 
-        // Listen for real-time changes from either user
-        pushupApp.on((data) => {
-            if (data) {
-                currentData.brodie = data.brodie || 0;
-                currentData.ned = data.ned || 0;
-                
-                brodieEl.innerText = currentData.brodie;
-                nedEl.innerText = currentData.ned;
-            }
-        });
-
-        // Increment counts inside GunDB
-        function increment(user) {
-            const newCount = (currentData[user] || 0) + 1;
-            pushupApp.put({ [user]: newCount });
-        }
-
-        // Helper function to get current date string in Adelaide time zone
+        // Helper function to get current cycle date string in Adelaide time zone
         function getAdelaideDateKey() {
             const options = { timeZone: 'Australia/Adelaide', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', hour12: false };
             const formatter = new Intl.DateTimeFormat('en-AU', options);
@@ -88,35 +74,94 @@
             let day = parseInt(map.day, 10);
             const hour = parseInt(map.hour, 10);
 
-            // Because the reset is exactly at 12:00 PM (noon), any hour BEFORE 12 PM 
-            // belongs to the "pushup day" that started yesterday at noon.
-            // If it's 12:00 PM or later, it's the current calendar day's cycle.
+            // Resets exactly at 12:00 PM (noon). Hours 0-11 belong to the previous day's challenge cycle
             if (hour < 12) {
                 day -= 1; 
             }
-
-            // Return a distinct string key unique to the current 24-hour cycle window
             return `${year}-${month}-${day}`;
         }
 
-        // Track the current cycle window locally
-        let activeCycleKey = localStorage.getItem('pushup_cycle_key') || getAdelaideDateKey();
-        localStorage.setItem('pushup_cycle_key', activeCycleKey);
-
-        // Check if the 12:00 PM Adelaide reset window has crossed
-        function checkReset() {
-            const currentCycleKey = getAdelaideDateKey();
-            if (currentCycleKey !== activeCycleKey) {
-                // Window has shifted past 12:00 PM Adelaide time. Reset the dataset.
-                pushupApp.put({ brodie: 0, ned: 0 });
-                activeCycleKey = currentCycleKey;
-                localStorage.setItem('pushup_cycle_key', activeCycleKey);
+        // Fetch live counts from the cloud
+        async function fetchCounts() {
+            if (isUpdating) return; 
+            try {
+                const response = await fetch(API_URL);
+                if (response.ok) {
+                    const data = await response.json();
+                    
+                    // Verify if the cloud data matches our current Adelaide date cycle
+                    const currentCycle = getAdelaideDateKey();
+                    if (data.cycleKey === currentCycle) {
+                        currentData.brodie = data.brodie || 0;
+                        currentData.ned = data.ned || 0;
+                    } else {
+                        // Cloud has old data, trigger a fresh reset cycle locally
+                        currentData.brodie = 0;
+                        currentData.ned = 0;
+                    }
+                    
+                    updateUI();
+                    statusEl.innerText = "Live Synced via Cloud Storage";
+                    statusEl.className = "text-center text-xs text-emerald-500 border-t border-slate-700 pt-4";
+                } else if (response.status === 404) {
+                    // First time initialization
+                    await saveCounts(0, 0);
+                }
+            } catch (err) {
+                statusEl.innerText = "Syncing paused (checking connection...)";
+                statusEl.className = "text-center text-xs text-amber-500 border-t border-slate-700 pt-4";
             }
         }
 
-        // Check for resets every 5 seconds
-        setInterval(checkReset, 5000);
-        checkReset();
+        // Save counts to the cloud
+        async function saveCounts(brodieVal, nedVal) {
+            isUpdating = true;
+            const payload = {
+                cycleKey: getAdelaideDateKey(),
+                brodie: brodieVal,
+                ned: nedVal
+            };
+
+            try {
+                await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                currentData.brodie = brodieVal;
+                currentData.ned = nedVal;
+                updateUI();
+            } catch (err) {
+                console.error("Failed to save data:", err);
+            } finally {
+                isUpdating = false;
+            }
+        }
+
+        function updateUI() {
+            brodieEl.innerText = currentData.brodie;
+            nedEl.innerText = currentData.ned;
+        }
+
+        // Handle button clicks
+        async function increment(user) {
+            // Optimistic UI update so it feels instant when clicking
+            if (user === 'brodie') {
+                currentData.brodie += 1;
+            } else {
+                currentData.ned += 1;
+            }
+            updateUI();
+
+            // Push to cloud instantly
+            await saveCounts(currentData.brodie, currentData.ned);
+        }
+
+        // Auto-refresh data from cloud every 3 seconds to capture changes from the other device
+        setInterval(fetchCounts, 3000);
+        
+        // Initial load
+        fetchCounts();
     </script>
 </body>
 </html>
