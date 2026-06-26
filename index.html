@@ -409,6 +409,25 @@
             await saveCounts(currentData.users);
         }
 
+        async function handleRemoveFriend(event, name) {
+            event.stopPropagation();
+            if (!confirm(`Are you sure you want to permanently remove "${name}"?`)) return;
+
+            if (currentData.users[name] !== undefined) {
+                delete currentData.users[name];
+            }
+            if (currentData.yesterday && currentData.yesterday[name] !== undefined) {
+                delete currentData.yesterday[name];
+            }
+
+            if (selectedUser === name) {
+                selectedUser = null;
+            }
+
+            updateUI();
+            await saveCounts(currentData.users);
+        }
+
         // Secret settings modal triggers
         function toggleSettingsModal() {
             const modal = document.getElementById('settings-modal');
