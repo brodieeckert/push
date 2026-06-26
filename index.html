@@ -25,6 +25,26 @@
 </head>
 <body class="text-zinc-100 min-h-screen flex flex-col items-center justify-center p-4 md:p-8">
 
+    <!-- Loading Overlay Screen -->
+    <div id="loading-overlay" class="fixed inset-0 bg-[#0c0c0e] z-45 flex flex-col items-center justify-center gap-8 transition-opacity duration-300">
+        <div class="text-center select-none cursor-pointer" id="loading-header" title="Double click to open developer settings">
+            <h1 class="text-5xl md:text-6xl font-display font-bold tracking-wider text-white hover:text-[#ccff00] transition-colors duration-200">
+                Daily Pushup Challenge
+            </h1>
+            <p class="text-zinc-400 text-xs font-bold uppercase tracking-widest mt-2">Syncing with server</p>
+        </div>
+        
+        <!-- Pulsing Volt Loader -->
+        <div class="relative flex items-center justify-center w-16 h-16">
+            <div class="absolute w-12 h-12 rounded-full border-4 border-[#ccff00]/20 animate-ping"></div>
+            <div class="absolute w-12 h-12 rounded-full border-4 border-t-[#ccff00] border-r-[#ccff00] border-b-transparent border-l-transparent animate-spin"></div>
+        </div>
+        
+        <div id="loading-status" class="text-center text-xs text-zinc-500 uppercase tracking-wider font-semibold">
+            Connecting to local network...
+        </div>
+    </div>
+
     <div class="w-full max-w-4xl flex flex-col gap-6">
         <header class="text-center select-none cursor-pointer" id="app-header" title="Double click to open developer settings">
             <h1 class="text-5xl md:text-6xl font-display font-bold tracking-wider text-white hover:text-[#ccff00] transition-colors duration-200">
@@ -193,6 +213,7 @@
         let currentData = { cycleKey: "", users: {} };
         let isUpdating = false;
         let selectedUser = null;
+        let isInitialized = false;
 
         const statusEl = document.getElementById('status');
 
@@ -252,10 +273,24 @@
                     updateUI();
                     statusEl.innerText = "Live Synced via Local Server";
                     statusEl.className = "text-center text-xs text-emerald-400 uppercase tracking-wider font-semibold";
+
+                    if (!isInitialized) {
+                        isInitialized = true;
+                        const overlay = document.getElementById('loading-overlay');
+                        if (overlay) {
+                            overlay.classList.add('hidden');
+                        }
+                    }
                 }
             } catch (err) {
                 statusEl.innerText = "Syncing paused (checking connection...)";
                 statusEl.className = "text-center text-xs text-amber-500 uppercase tracking-wider font-semibold";
+
+                const loadingStatus = document.getElementById('loading-status');
+                if (loadingStatus) {
+                    loadingStatus.innerText = "Syncing paused (checking connection...)";
+                    loadingStatus.className = "text-center text-xs text-amber-500 uppercase tracking-wider font-semibold";
+                }
             }
         }
 
@@ -564,6 +599,7 @@
 
         // Bind secret shortcuts
         document.getElementById('app-header').ondblclick = toggleSettingsModal;
+        document.getElementById('loading-header').ondblclick = toggleSettingsModal;
         
         window.addEventListener('keydown', (e) => {
             if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === 's') {
