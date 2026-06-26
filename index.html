@@ -33,29 +33,27 @@
             <p class="text-zinc-400 text-xs font-bold uppercase tracking-widest mt-2">Target: 100 pushups each day</p>
         </header>
 
-        <!-- Main Grid Layout -->
+        <!-- Main Workspace Grid Layout -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
             
-            <!-- Left Column: Selection and Actions (2/3 width on desktop) -->
+            <!-- Left Column: Owner Dashboard (2/3 width on desktop) -->
             <div class="md:col-span-2 bg-[#141416] rounded-2xl shadow-xl p-6 border border-zinc-800/80 flex flex-col justify-between min-h-[350px]">
                 <div>
                     <h2 class="text-xs font-bold text-zinc-400 uppercase tracking-widest mb-4 flex items-center gap-2">
                         <span class="w-2 h-2 rounded-full bg-[#ccff00] animate-pulse"></span>
-                        Select Who You Are:
+                        My Training Progress:
                     </h2>
                     
-                    <!-- Profile selection area -->
-                    <div id="user-selection" class="flex flex-wrap gap-2.5 mb-8">
-                        <!-- Dynamically populated buttons -->
+                    <div class="flex flex-col items-center justify-center my-6">
+                        <span id="active-user-display" class="text-3xl font-display font-bold text-[#ccff00] tracking-wide mb-2">Welcome Back!</span>
+                        <div class="text-center">
+                            <span id="active-user-count" class="text-8xl font-display font-black text-white leading-none">0</span>
+                            <span class="text-zinc-500 font-display text-2xl block mt-1">/ 100 Pushups</span>
+                        </div>
                     </div>
                 </div>
 
                 <div class="border-t border-zinc-800/60 pt-6">
-                    <div class="text-center mb-6">
-                        <span class="text-zinc-400 text-xs block uppercase tracking-wider font-semibold mb-1">Selected Active Profile</span>
-                        <span id="active-user-display" class="text-3xl font-display font-bold text-zinc-500">No profile selected</span>
-                    </div>
-
                     <!-- Large Action Buttons -->
                     <div class="grid grid-cols-2 gap-4">
                         <button id="btn-plus-1" onclick="incrementActive(1)" disabled class="w-full bg-[#ccff00] hover:bg-[#b8e600] active:scale-95 disabled:hover:bg-zinc-800 disabled:bg-zinc-800 disabled:opacity-20 disabled:scale-100 transition-all text-black disabled:text-zinc-500 font-display font-bold py-5 rounded-xl text-4xl shadow-lg shadow-[#ccff00]/10">
@@ -77,7 +75,7 @@
                     </h2>
                     
                     <!-- Dynamic Leaderboard list -->
-                    <div id="leaderboard-list" class="space-y-3.5 max-h-[160px] overflow-y-auto pr-1">
+                    <div id="leaderboard-list" class="space-y-3.5 max-h-[180px] overflow-y-auto pr-1">
                         <!-- Dynamically populated items -->
                     </div>
                 </div>
@@ -88,20 +86,9 @@
                         <h3 class="text-xs font-bold text-zinc-400 uppercase tracking-widest">Yesterday's Results</h3>
                         <span id="yesterday-date" class="text-[10px] font-bold text-zinc-500"></span>
                     </div>
-                    <div id="yesterday-list" class="space-y-2 max-h-[120px] overflow-y-auto pr-1 text-zinc-300">
+                    <div id="yesterday-list" class="space-y-2 max-h-[140px] overflow-y-auto pr-1 text-zinc-300">
                         <!-- Dynamically populated -->
                     </div>
-                </div>
-
-                <!-- Add Friend Section -->
-                <div class="border-t border-zinc-800/60 pt-4 mt-4">
-                    <h3 class="text-xs font-bold text-zinc-400 uppercase tracking-widest mb-2">Add Friend</h3>
-                    <form onsubmit="handleAddFriend(event)" class="flex gap-2">
-                        <input id="new-friend-name" type="text" placeholder="Friend's name..." required class="flex-1 bg-black border border-zinc-800 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-[#ccff00] text-zinc-100 placeholder-zinc-600" />
-                        <button type="submit" class="bg-zinc-800 hover:bg-zinc-700 active:scale-95 transition-all text-zinc-200 px-4 py-2 rounded-lg text-sm font-bold shadow-md">
-                            Add
-                        </button>
-                    </form>
                 </div>
             </div>
             
@@ -115,7 +102,36 @@
         </div>
     </div>
 
-    <!-- Developer Settings Modal Overlay (Hidden by Default) -->
+    <!-- Onboarding Modal Overlay (Prompts user to register/select their device owner name) -->
+    <div id="onboarding-modal" class="fixed inset-0 bg-black/95 backdrop-blur z-40 flex items-center justify-center hidden">
+        <div class="bg-[#141416] border border-zinc-800 rounded-2xl p-8 w-full max-w-md shadow-2xl mx-4 text-center">
+            <h2 class="text-4xl font-display font-bold tracking-wider text-white mb-2">
+                Who is using this device?
+            </h2>
+            <p class="text-zinc-500 text-xs uppercase tracking-wider mb-6 font-semibold">Select your name to log your pushups</p>
+            
+            <!-- Existing profiles section -->
+            <div id="onboarding-existing-section" class="mb-8 hidden">
+                <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-widest block mb-3 text-left">Select your profile:</span>
+                <div id="onboarding-profiles" class="flex flex-wrap gap-2 justify-center max-h-[160px] overflow-y-auto pr-1">
+                    <!-- Dynamic user buttons -->
+                </div>
+            </div>
+
+            <!-- New profile section -->
+            <div class="border-t border-zinc-800/80 pt-6">
+                <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-widest block mb-3 text-left">Or register a new name:</span>
+                <form onsubmit="handleOnboardingRegister(event)" class="flex gap-2">
+                    <input id="onboarding-name-input" type="text" placeholder="Enter your name..." required class="flex-1 bg-black border border-zinc-800 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-[#ccff00] text-zinc-100 placeholder-zinc-600" />
+                    <button type="submit" class="bg-[#ccff00] hover:bg-[#b8e600] active:scale-95 transition-all text-black px-4 py-2 rounded-lg text-sm font-bold shadow-md">
+                        Join
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Developer Settings Modal Overlay -->
     <div id="settings-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center hidden">
         <div class="bg-zinc-900 border border-zinc-800 rounded-2xl p-6 w-full max-w-md shadow-2xl relative mx-4">
             <button onclick="toggleSettingsModal()" class="absolute top-4 right-4 text-zinc-500 hover:text-zinc-300 transition-colors focus:outline-none" title="Close">
@@ -125,26 +141,49 @@
             </button>
             
             <h3 class="text-lg font-bold text-zinc-200 uppercase tracking-wider mb-4 flex items-center gap-2 font-display">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-[#ccff00]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                </svg>
                 Developer Settings
             </h3>
             
-            <div class="space-y-4">
+            <div class="space-y-4 max-h-[450px] overflow-y-auto pr-1">
+                <!-- Device Owner config -->
+                <div class="bg-black/40 border border-zinc-800/60 p-3 rounded-lg">
+                    <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wide block mb-1">Device Registration</span>
+                    <span id="dev-device-owner" class="text-xs text-zinc-300 block mb-2">This device is registered to: <b class="text-[#ccff00]" id="dev-device-owner-name">None</b></span>
+                    <button onclick="resetDeviceOwner()" class="bg-zinc-800 hover:bg-zinc-700 active:scale-95 transition-all text-xs text-zinc-200 font-bold px-3 py-1.5 rounded-lg shadow-sm">
+                        Change Device Owner
+                    </button>
+                </div>
+
+                <!-- API url config -->
                 <div>
                     <label class="block text-[10px] font-bold text-zinc-400 uppercase tracking-wide mb-1" for="settings-api-url">API Endpoint URL</label>
-                    <input id="settings-api-url" type="text" class="w-full bg-black border border-zinc-800 rounded-lg px-3 py-2 text-xs text-zinc-200 focus:outline-none focus:border-[#ccff00]" />
-                    <span class="text-[10px] text-zinc-500 block mt-1.5 leading-normal">Configure the API address to sync counts. Double-click the main header or press <b>Ctrl+Shift+S</b> to toggle this menu.</span>
+                    <input id="settings-api-url" type="text" class="w-full bg-black border border-zinc-800 rounded-lg px-3 py-1.5 text-xs text-zinc-200 focus:outline-none focus:border-[#ccff00]" />
+                    <div class="flex gap-2 justify-end mt-1.5">
+                        <button onclick="resetSettings()" class="text-[10px] text-zinc-500 hover:text-zinc-300 transition-colors py-1">
+                            Reset Default
+                        </button>
+                        <button onclick="saveSettings()" class="bg-[#ccff00] hover:bg-[#b8e600] active:scale-95 transition-all text-black px-3 py-1 rounded text-[10px] font-black shadow-md">
+                            Apply API URL
+                        </button>
+                    </div>
                 </div>
-                <div class="flex gap-2 justify-end pt-2">
-                    <button onclick="resetSettings()" class="text-xs text-zinc-500 hover:text-zinc-300 transition-colors px-3 py-2">
-                        Reset to Default
-                    </button>
-                    <button onclick="saveSettings()" class="bg-[#ccff00] hover:bg-[#b8e600] active:scale-95 transition-all text-black px-4 py-2 rounded-lg text-xs font-black shadow-lg shadow-[#ccff00]/10">
-                        Apply & Reconnect
-                    </button>
+
+                <!-- Manage users section -->
+                <div class="border-t border-zinc-800/60 pt-3">
+                    <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wide block mb-2">Manage Members</span>
+                    
+                    <!-- Dev Users list -->
+                    <div id="dev-users-list" class="space-y-1.5 max-h-[120px] overflow-y-auto mb-3">
+                        <!-- Dynamic user rows with Delete buttons -->
+                    </div>
+
+                    <!-- Add User Form inside Dev Panel -->
+                    <form onsubmit="handleDevAddUser(event)" class="flex gap-2">
+                        <input id="dev-new-user-name" type="text" placeholder="Add member name..." required class="flex-1 bg-black border border-zinc-800 rounded-lg px-2.5 py-1.5 text-xs focus:outline-none focus:border-[#ccff00] text-zinc-200 placeholder-zinc-650" />
+                        <button type="submit" class="bg-zinc-800 hover:bg-zinc-700 active:scale-95 transition-all text-zinc-200 px-3 py-1.5 rounded-lg text-xs font-bold shadow-md">
+                            Add
+                        </button>
+                    </form>
                 </div>
             </div>
         </div>
@@ -195,6 +234,7 @@
                         currentData.yesterday = data.yesterday || {};
                         currentData.yesterdayCycleKey = data.yesterdayCycleKey || "";
                     } else {
+                        // Resets all counts at 12pm Adelaide Time (Noon)
                         const previousUsers = data.users || {};
                         const resetUsers = {};
                         for (const u in previousUsers) {
@@ -208,6 +248,7 @@
                         await saveCounts(resetUsers, previousUsers, data.cycleKey || ""); 
                     }
                     
+                    checkDeviceOwner();
                     updateUI();
                     statusEl.innerText = "Live Synced via Local Server";
                     statusEl.className = "text-center text-xs text-emerald-400 uppercase tracking-wider font-semibold";
@@ -249,46 +290,102 @@
             }
         }
 
-        // Update the layout and leaderboard
-        function updateUI() {
-            // Render selection buttons
-            const userSelectionEl = document.getElementById('user-selection');
-            userSelectionEl.innerHTML = '';
-            
+        // Check if the device has an owner set up
+        function checkDeviceOwner() {
+            const myName = localStorage.getItem('my_pushups_name');
+            const onboardingModal = document.getElementById('onboarding-modal');
             const users = currentData.users || {};
-            const userNames = Object.keys(users);
-            
-            if (userNames.length === 0) {
-                userSelectionEl.innerHTML = `<span class="text-xs text-zinc-500 italic">No friends added yet. Add one in the sidebar!</span>`;
+
+            if (myName && users[myName] !== undefined) {
+                selectedUser = myName;
+                onboardingModal.classList.add('hidden');
             } else {
-                userNames.forEach(name => {
-                    const isActive = selectedUser === name;
-                    const btn = document.createElement('button');
-                    btn.className = `px-4 py-2.5 rounded-lg font-display font-bold text-base border transition-all active:scale-95 ${
-                        isActive 
-                            ? 'bg-[#ccff00] text-black border-transparent shadow-md' 
-                            : 'bg-zinc-900 text-zinc-400 border-zinc-800 hover:bg-zinc-800 hover:text-zinc-200'
-                    }`;
-                    btn.innerText = name;
-                    btn.onclick = () => selectUser(name);
-                    userSelectionEl.appendChild(btn);
-                });
+                // If owner not registered or has been deleted, show onboarding overlay
+                selectedUser = null;
+                localStorage.removeItem('my_pushups_name');
+                onboardingModal.classList.remove('hidden');
+                
+                // Populate onboarding selection buttons
+                const onboardingProfiles = document.getElementById('onboarding-profiles');
+                const existingSection = document.getElementById('onboarding-existing-section');
+                onboardingProfiles.innerHTML = '';
+                
+                const userNames = Object.keys(users);
+                if (userNames.length > 0) {
+                    existingSection.classList.remove('hidden');
+                    userNames.forEach(name => {
+                        const btn = document.createElement('button');
+                        btn.className = "px-4 py-2 rounded-lg bg-zinc-800 hover:bg-zinc-700 font-display font-bold text-base text-zinc-200 transition-all active:scale-95";
+                        btn.innerText = name;
+                        btn.onclick = () => selectDeviceOwner(name);
+                        onboardingProfiles.appendChild(btn);
+                    });
+                } else {
+                    existingSection.classList.add('hidden');
+                }
+            }
+        }
+
+        // Onboarding handlers
+        function selectDeviceOwner(name) {
+            localStorage.setItem('my_pushups_name', name);
+            selectedUser = name;
+            document.getElementById('onboarding-modal').classList.add('hidden');
+            updateUI();
+        }
+
+        async function handleOnboardingRegister(event) {
+            event.preventDefault();
+            const input = document.getElementById('onboarding-name-input');
+            const name = input.value.trim();
+            if (!name) return;
+
+            if (currentData.users[name] !== undefined) {
+                alert(`The name "${name}" is already taken!`);
+                return;
             }
 
-            // Update active user state and buttons
+            // Register owner profile
+            currentData.users[name] = 0;
+            input.value = '';
+            
+            localStorage.setItem('my_pushups_name', name);
+            selectedUser = name;
+            
+            document.getElementById('onboarding-modal').classList.add('hidden');
+            updateUI();
+            await saveCounts(currentData.users);
+        }
+
+        // Reset device ownership from developer modal
+        function resetDeviceOwner() {
+            if (!confirm("Are you sure you want to log out of this device profile?")) return;
+            localStorage.removeItem('my_pushups_name');
+            selectedUser = null;
+            toggleSettingsModal();
+            checkDeviceOwner();
+            updateUI();
+        }
+
+        // Update the dashboard and leaderboard lists
+        function updateUI() {
+            const users = currentData.users || {};
+            const userCount = selectedUser ? (users[selectedUser] || 0) : 0;
+
+            // Update Main Personal Stats
             const activeUserDisplay = document.getElementById('active-user-display');
+            const activeUserCountEl = document.getElementById('active-user-count');
             const btnPlus1 = document.getElementById('btn-plus-1');
             const btnPlus10 = document.getElementById('btn-plus-10');
 
-            if (selectedUser && users[selectedUser] !== undefined) {
-                activeUserDisplay.innerText = `${selectedUser} (${users[selectedUser]} pushups)`;
-                activeUserDisplay.className = "text-3xl font-display font-bold text-[#ccff00] tracking-wide";
+            if (selectedUser) {
+                activeUserDisplay.innerText = `Welcome Back, ${selectedUser}!`;
+                activeUserCountEl.innerText = userCount;
                 btnPlus1.disabled = false;
                 btnPlus10.disabled = false;
             } else {
-                selectedUser = null; 
                 activeUserDisplay.innerText = "No profile selected";
-                activeUserDisplay.className = "text-3xl font-display font-bold text-zinc-600 tracking-wide";
+                activeUserCountEl.innerText = "0";
                 btnPlus1.disabled = true;
                 btnPlus10.disabled = true;
             }
@@ -324,14 +421,7 @@
                     item.innerHTML = `
                         <div class="flex justify-between items-center text-sm font-semibold">
                             <span class="${selectedUser === name ? 'text-[#ccff00] font-bold' : 'text-zinc-300'}">${name}</span>
-                            <div class="flex items-center gap-2">
-                                <span class="text-zinc-400 font-display text-lg">${count} <span class="text-xs text-zinc-500">/ 100</span></span>
-                                <button onclick="handleRemoveFriend(event, '${name}')" class="text-zinc-500 hover:text-rose-500 active:scale-95 transition-all px-1" title="Remove Friend">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                                        <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
-                                    </svg>
-                                </button>
-                            </div>
+                            <span class="text-zinc-400 font-display text-lg">${count} <span class="text-xs text-zinc-500">/ 100</span></span>
                         </div>
                         <div class="w-full bg-zinc-950 h-2 rounded-full overflow-hidden border border-zinc-900">
                             <div class="h-full ${progressColor} transition-all duration-500" style="width: ${percentage}%"></div>
@@ -356,7 +446,7 @@
             const sortedYesterday = Object.entries(yesterdayUsers).sort((a, b) => b[1] - a[1]);
 
             if (sortedYesterday.length === 0) {
-                yesterdayList.innerHTML = `<div class="text-[11px] text-zinc-600 italic py-2 text-center">No history available yet.</div>`;
+                yesterdayList.innerHTML = `<div class="text-[11px] text-zinc-650 italic py-2 text-center">No history available yet.</div>`;
             } else {
                 sortedYesterday.forEach(([name, count]) => {
                     const row = document.createElement('div');
@@ -370,11 +460,6 @@
             }
         }
 
-        function selectUser(name) {
-            selectedUser = name;
-            updateUI();
-        }
-
         async function incrementActive(amount) {
             if (!selectedUser || currentData.users[selectedUser] === undefined) return;
             currentData.users[selectedUser] += amount;
@@ -382,28 +467,52 @@
             await saveCounts(currentData.users);
         }
 
-        async function handleAddFriend(event) {
+        // Developer tools handlers
+        function renderDevUserList() {
+            const devUsersList = document.getElementById('dev-users-list');
+            devUsersList.innerHTML = '';
+            
+            const users = currentData.users || {};
+            const entries = Object.entries(users);
+            
+            if (entries.length === 0) {
+                devUsersList.innerHTML = `<span class="text-xs text-zinc-600 italic">No users in database</span>`;
+            } else {
+                entries.forEach(([name, count]) => {
+                    const row = document.createElement('div');
+                    row.className = "flex justify-between items-center bg-black/30 border border-zinc-800 p-2 rounded-lg text-xs";
+                    row.innerHTML = `
+                        <span class="text-zinc-300 font-semibold">${name} (${count} pushups)</span>
+                        <button onclick="handleDevRemoveUser('${name}')" class="text-rose-500 hover:text-rose-400 transition-colors font-bold px-2 py-1">
+                            Remove
+                        </button>
+                    `;
+                    devUsersList.appendChild(row);
+                });
+            }
+        }
+
+        async function handleDevAddUser(event) {
             event.preventDefault();
-            const input = document.getElementById('new-friend-name');
+            const input = document.getElementById('dev-new-user-name');
             const name = input.value.trim();
             if (!name) return;
 
             if (currentData.users[name] !== undefined) {
-                alert(`Friend "${name}" already exists!`);
+                alert(`User "${name}" already exists!`);
                 return;
             }
 
             currentData.users[name] = 0;
             input.value = '';
-            selectedUser = name; // Auto-select new profile
             
+            renderDevUserList();
             updateUI();
             await saveCounts(currentData.users);
         }
 
-        async function handleRemoveFriend(event, name) {
-            event.stopPropagation();
-            if (!confirm(`Are you sure you want to permanently remove "${name}"?`)) return;
+        async function handleDevRemoveUser(name) {
+            if (!confirm(`Are you sure you want to permanently delete "${name}" from the database?`)) return;
 
             if (currentData.users[name] !== undefined) {
                 delete currentData.users[name];
@@ -414,8 +523,11 @@
 
             if (selectedUser === name) {
                 selectedUser = null;
+                localStorage.removeItem('my_pushups_name');
             }
 
+            renderDevUserList();
+            checkDeviceOwner();
             updateUI();
             await saveCounts(currentData.users);
         }
@@ -426,6 +538,8 @@
             if (modal.classList.contains('hidden')) {
                 modal.classList.remove('hidden');
                 document.getElementById('settings-api-url').value = API_URL;
+                document.getElementById('dev-device-owner-name').innerText = selectedUser || "None";
+                renderDevUserList();
             } else {
                 modal.classList.add('hidden');
             }
